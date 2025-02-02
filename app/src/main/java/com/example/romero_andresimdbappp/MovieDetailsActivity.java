@@ -85,7 +85,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 .into(movieImageView);
 
         movieTitleTextView.setText(movie.getTitle() != null ? movie.getTitle() : "Título desconocido");
-
+        moviePlotTextView.setText(movie.getOverview() != null ? movie.getOverview() : "Sin descripción");
         movieReleaseDateTextView.setText(movie.getReleaseYear() != null ? "Release Date: " + movie.getReleaseYear() : "Fecha desconocida");
         movieRatingTextView.setText(movie.getRating() != null ? "Rating: " + movie.getRating() : "Sin rating");
     }
@@ -188,12 +188,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         String title = movie.getTitle() != null ? movie.getTitle() : "Título desconocido";
         String rating = movie.getRating() != null ? movie.getRating() : "Sin rating";
-
+        String overview = movie.getOverview() != null ? movie.getOverview() : "Sin descripción";
         String releaseDate = movie.getReleaseYear() != null ? movie.getReleaseYear() : "Fecha desconocida";
 
         String message = "Esta película te gustará: " + title +
                 "\nRating: " + rating +
-                "\n" +
+                "\n" + overview +
                 "\nRelease Date: " + releaseDate;
 
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO);

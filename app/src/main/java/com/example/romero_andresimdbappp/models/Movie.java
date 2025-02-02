@@ -15,6 +15,7 @@ public class Movie implements Parcelable {
     //Constructor vacio
     public Movie() {
     }
+
     protected Movie(Parcel in) {
         id = in.readString();
         title = in.readString();
@@ -23,8 +24,8 @@ public class Movie implements Parcelable {
         rating = in.readString();
         overview = in.readString();
         genreId = in.readString();
-
     }
+
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel in) {
@@ -93,6 +94,21 @@ public class Movie implements Parcelable {
 
     public void setRating(String rating) {
         this.rating = rating;
+    }
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
+    public String getGenreId() {
+        return genreId;
+    }
+
+    public void setGenreId(String genreId) {
+        this.genreId = genreId;
     }
 
 }
