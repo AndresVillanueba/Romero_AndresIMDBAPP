@@ -10,19 +10,21 @@ public class Movie implements Parcelable {
     private String imageUrl;
     private String releaseYear;
     private String rating;
+    private String overview;
+    private String genreId;
     //Constructor vacio
     public Movie() {
     }
-
     protected Movie(Parcel in) {
         id = in.readString();
         title = in.readString();
         imageUrl = in.readString();
         releaseYear = in.readString();
         rating = in.readString();
+        overview = in.readString();
+        genreId = in.readString();
 
     }
-
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel in) {
@@ -43,6 +45,8 @@ public class Movie implements Parcelable {
         dest.writeString(imageUrl);
         dest.writeString(releaseYear);
         dest.writeString(rating);
+        dest.writeString(overview);
+        dest.writeString(genreId);
 
     }
 
