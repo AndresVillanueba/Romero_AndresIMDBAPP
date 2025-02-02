@@ -6,7 +6,6 @@
     android:padding="16dp"
     android:gravity="center">
 
-    <!-- Botón de inicio de sesión con Google -->
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btn_google_sign_in"
         android:layout_width="wrap_content"

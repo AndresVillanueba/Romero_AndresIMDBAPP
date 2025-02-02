@@ -1,4 +1,5 @@
 package com.example.romero_andresimdbappp;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -26,36 +27,35 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailsActivity extends AppCompatActivity {
-
+    private TextView titulopelicula, resumenpelicula, calificacionpelicula, fechalanzamiento;
+    private ImageView imagenpelicula;
     private Button btnSms;
-    private ImageView movieImageView;
-    private TextView movieTitleTextView, moviePlotTextView, movieRatingTextView, movieReleaseDateTextView;
-    private static final String API_KEY = "c1cce6d145msh19937f212457748p163fd5jsnb262629a6f45";
+    private static final String API_CLAVE = "c1cce6d145msh19937f212457748p163fd5jsnb262629a6f45";
     private static final String API_HOST = "imdb-com.p.rapidapi.com";
-    private Movie selectedMovie;
-    private final ActivityResultLauncher<String[]> permissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                boolean allGranted = true;
-                for (Boolean granted : result.values()) {
-                    if (!granted) {
-                        allGranted = false;
+    private Movie pelicula;
+    private final ActivityResultLauncher<String[]> lanzador =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), resultado -> {
+                boolean Permisos = true;
+                for (Boolean concedido : resultado.values()) {
+                    if (!concedido) {
+                        Permisos = false;
                         break;
                     }
                 }
 
-                if (allGranted) {
-                    openContactPicker();
+                if (Permisos) {
+                    abrirSelectorDeContactos();
                 } else {
                     Toast.makeText(this, "Permisos denegados. No se puede enviar SMS.", Toast.LENGTH_SHORT).show();
                 }
             });
 
-    private final ActivityResultLauncher<Intent> contactPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri contactUri = result.getData().getData();
-                    if (contactUri != null) {
-                        retrievePhoneNumber(contactUri);
+    private final ActivityResultLauncher<Intent> SelectorContactos =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), resultado -> {
+                if (resultado.getResultCode() == Activity.RESULT_OK && resultado.getData() != null) {
+                    Uri uriContacto = resultado.getData().getData();
+                    if (uriContacto != null) {
+                        recuperarNumeroTelefono(uriContacto);
                     }
                 }
             });
@@ -64,58 +64,57 @@ public class MovieDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
-        movieImageView = findViewById(R.id.movie_image);
-        movieTitleTextView = findViewById(R.id.movie_title);
-        moviePlotTextView = findViewById(R.id.movie_plot);
-        movieRatingTextView = findViewById(R.id.movie_rating);
-        movieReleaseDateTextView = findViewById(R.id.movie_release_date);
+        imagenpelicula = findViewById(R.id.movie_image);
+        titulopelicula = findViewById(R.id.movie_title);
+        resumenpelicula = findViewById(R.id.movie_plot);
+        calificacionpelicula = findViewById(R.id.movie_rating);
+        fechalanzamiento = findViewById(R.id.movie_release_date);
         btnSms = findViewById(R.id.btnSms);
-        selectedMovie = getIntent().getParcelableExtra("MOVIE_DATA");
-        if (selectedMovie != null) {
-            displayMovieDetails(selectedMovie);
-            fetchMovieDetailsFromAPI(selectedMovie.getId());
+        pelicula = getIntent().getParcelableExtra("MOVIE_DATA");
+        if (pelicula != null) {
+            mostrarDetallesPelicula(pelicula);
+            obtenerDetallesPeliculaDeApi(pelicula.getId());
         }
-        btnSms.setOnClickListener(v -> checkPermissionsAndSendSms());
+        btnSms.setOnClickListener(v -> verificarPermisosYEnviarSms());
     }
 
-    private void displayMovieDetails(Movie movie) {
+    private void mostrarDetallesPelicula(Movie pelicula) {
         Glide.with(this)
-                .load(movie.getImageUrl())
+                .load(pelicula.getImageUrl())
                 .placeholder(R.drawable.default_user_image)
-                .into(movieImageView);
-
-        movieTitleTextView.setText(movie.getTitle() != null ? movie.getTitle() : "Título desconocido");
-        moviePlotTextView.setText(movie.getOverview() != null ? movie.getOverview() : "Sin descripción");
-        movieReleaseDateTextView.setText(movie.getReleaseYear() != null ? "Release Date: " + movie.getReleaseYear() : "Fecha desconocida");
-        movieRatingTextView.setText(movie.getRating() != null ? "Rating: " + movie.getRating() : "Sin rating");
+                .into(imagenpelicula);
+        titulopelicula.setText(pelicula.getTitle() != null ? pelicula.getTitle() : "Título desconocido");
+        resumenpelicula.setText(pelicula.getOverview() != null ? pelicula.getOverview() : "Sin descripción");
+        fechalanzamiento.setText(pelicula.getReleaseYear() != null ? "Fecha de lanzamiento: " + pelicula.getReleaseYear() : "Fecha desconocida");
+        calificacionpelicula.setText(pelicula.getRating() != null ? "Calificación: " + pelicula.getRating() : "Sin calificación");
     }
 
-    private void fetchMovieDetailsFromAPI(String movieId) {
+    private void obtenerDetallesPeliculaDeApi(String idPelicula) {
         IMDBApiService apiService = new Retrofit.Builder()
                 .baseUrl("https://imdb-com.p.rapidapi.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(IMDBApiService.class);
 
-        Call<MovieOverviewResponse> call = apiService.getOverview(API_KEY, API_HOST, movieId);
+        Call<MovieOverviewResponse> llamada = apiService.getOverview(API_CLAVE, API_HOST, idPelicula);
 
-        call.enqueue(new Callback<MovieOverviewResponse>() {
+        llamada.enqueue(new Callback<MovieOverviewResponse>() {
             @Override
             public void onResponse(Call<MovieOverviewResponse> call, Response<MovieOverviewResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    MovieOverviewResponse.Data data = response.body().getData();
-                    updateUIWithDetails(data);
+                    MovieOverviewResponse.Data datos = response.body().getData();
+                    actualizarInterfazConDetalles(datos);
 
-                    if (selectedMovie != null) {
-                        if (data.getTitle() != null) {
-                            MovieOverviewResponse.RatingsSummary ratings = data.getTitle().getRatingsSummary();
-                            if (ratings != null) {
-                                selectedMovie.setRating(String.valueOf(ratings.getAggregateRating()));
+                    if (pelicula != null) {
+                        if (datos.getTitle() != null) {
+                            MovieOverviewResponse.RatingsSummary calificaciones = datos.getTitle().getRatingsSummary();
+                            if (calificaciones != null) {
+                                pelicula.setRating(String.valueOf(calificaciones.getAggregateRating()));
                             }
 
-                            MovieOverviewResponse.Plot plot = data.getTitle().getPlot();
-                            if (plot != null && plot.getPlotText() != null) {
-
+                            MovieOverviewResponse.Plot trama = datos.getTitle().getPlot();
+                            if (trama != null && trama.getPlotText() != null) {
+                                pelicula.setOverview(trama.getPlotText().getPlainText());
                             }
                         }
                     }
@@ -129,77 +128,70 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUIWithDetails(MovieOverviewResponse.Data data) {
-        if (data.getTitle() != null && data.getTitle().getTitleText() != null) {
-            movieTitleTextView.setText(data.getTitle().getTitleText().getText());
+    private void actualizarInterfazConDetalles(MovieOverviewResponse.Data datos) {
+        if (datos.getTitle() != null && datos.getTitle().getTitleText() != null) {
+            titulopelicula.setText(datos.getTitle().getTitleText().getText());
         }
 
-        if (data.getTitle() != null && data.getTitle().getReleaseDate() != null) {
-            MovieOverviewResponse.ReleaseDate releaseDate = data.getTitle().getReleaseDate();
-            String formattedDate = releaseDate.getDay() + "/" + releaseDate.getMonth() + "/" + releaseDate.getYear();
-            movieReleaseDateTextView.setText("Release Date: " + formattedDate);
+        if (datos.getTitle() != null && datos.getTitle().getReleaseDate() != null) {
+            MovieOverviewResponse.ReleaseDate fechaLanzamiento = datos.getTitle().getReleaseDate();
+            String fechaFormateada = fechaLanzamiento.getDay() + "/" + fechaLanzamiento.getMonth() + "/" + fechaLanzamiento.getYear();
+            fechalanzamiento.setText("Fecha de lanzamiento: " + fechaFormateada);
         }
 
-        if (data.getTitle() != null && data.getTitle().getRatingsSummary() != null) {
-            movieRatingTextView.setText("Rating: " + data.getTitle().getRatingsSummary().getAggregateRating());
+        if (datos.getTitle() != null && datos.getTitle().getRatingsSummary() != null) {
+            calificacionpelicula.setText("Calificación: " + datos.getTitle().getRatingsSummary().getAggregateRating());
         }
 
-        if (data.getTitle() != null && data.getTitle().getPlot() != null && data.getTitle().getPlot().getPlotText() != null) {
-            moviePlotTextView.setText(data.getTitle().getPlot().getPlotText().getPlainText());
+        if (datos.getTitle() != null && datos.getTitle().getPlot() != null && datos.getTitle().getPlot().getPlotText() != null) {
+            resumenpelicula.setText(datos.getTitle().getPlot().getPlotText().getPlainText());
         }
     }
 
-    private void checkPermissionsAndSendSms() {
+    private void verificarPermisosYEnviarSms() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            permissionLauncher.launch(new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS});
+            lanzador.launch(new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS});
         } else {
-            openContactPicker();
+            abrirSelectorDeContactos();
         }
     }
 
-    private void openContactPicker() {
+    private void abrirSelectorDeContactos() {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-        contactPickerLauncher.launch(intent);
+        SelectorContactos.launch(intent);
     }
 
-    private void retrievePhoneNumber(Uri contactUri) {
-        String phoneNumber = null;
+    private void recuperarNumeroTelefono(Uri uriContacto) {
+        String numeroTelefono = null;
 
-        try (Cursor cursor = getContentResolver().query(contactUri, null, null, null, null)) {
+        try (Cursor cursor = getContentResolver().query(uriContacto, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
-                int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                phoneNumber = cursor.getString(numberIndex);
+                int indiceNumero = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                numeroTelefono = cursor.getString(indiceNumero);
             }
         }
 
-        if (phoneNumber != null) {
-            sendSms(phoneNumber, selectedMovie);
+        if (numeroTelefono != null) {
+            enviarSms(numeroTelefono, pelicula);
         } else {
             Toast.makeText(this, "No se encontró un número de teléfono válido.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void sendSms(String phoneNumber, Movie movie) {
-        if (movie == null) {
+    private void enviarSms(String numeroTelefono, Movie pelicula) {
+        if (pelicula == null) {
             Toast.makeText(this, "No se pudo obtener la información de la película.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        String title = movie.getTitle() != null ? movie.getTitle() : "Título desconocido";
-        String rating = movie.getRating() != null ? movie.getRating() : "Sin rating";
-        String overview = movie.getOverview() != null ? movie.getOverview() : "Sin descripción";
-        String releaseDate = movie.getReleaseYear() != null ? movie.getReleaseYear() : "Fecha desconocida";
-
-        String message = "Esta película te gustará: " + title +
-                "\nRating: " + rating +
-                "\n" + overview +
-                "\nRelease Date: " + releaseDate;
-
+        String titulo = pelicula.getTitle() != null ? pelicula.getTitle() : "Título desconocido";
+        String calificacion = pelicula.getRating() != null ? pelicula.getRating() : "Sin calificación";
+        String resumen = pelicula.getOverview() != null ? pelicula.getOverview() : "Sin descripción";
+        String fechaLanzamiento = pelicula.getReleaseYear() != null ? pelicula.getReleaseYear() : "Fecha desconocida";
+        String mensaje = "Esta película te gustará: " + titulo + "\nCalificación: " + calificacion + "\n" + resumen + "\nFecha de lanzamiento: " + fechaLanzamiento;
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
-        smsIntent.setData(Uri.parse("smsto:" + phoneNumber));
-        smsIntent.putExtra("sms_body", message);
-
+        smsIntent.setData(Uri.parse("smsto:" + numeroTelefono));
+        smsIntent.putExtra("sms_body", mensaje);
         try {
             startActivity(smsIntent);
         } catch (Exception e) {

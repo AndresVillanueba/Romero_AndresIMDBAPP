@@ -3,8 +3,9 @@ package com.example.romero_andresimdbappp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+//Clase que representa una película con atributos
 public class Movie implements Parcelable {
-    // Atributos
+    // Atributos de la película
     private String id;
     private String title;
     private String imageUrl;
@@ -12,10 +13,10 @@ public class Movie implements Parcelable {
     private String rating;
     private String overview;
     private String genreId;
-    //Constructor vacio
+    // Constructor vacío
     public Movie() {
     }
-
+    // Constructor utilizado para Parcelable
     protected Movie(Parcel in) {
         id = in.readString();
         title = in.readString();
@@ -26,6 +27,7 @@ public class Movie implements Parcelable {
         genreId = in.readString();
     }
 
+    // Implementación del Parcelable
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel in) {
@@ -38,7 +40,6 @@ public class Movie implements Parcelable {
         }
     };
 
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
@@ -48,7 +49,6 @@ public class Movie implements Parcelable {
         dest.writeString(rating);
         dest.writeString(overview);
         dest.writeString(genreId);
-
     }
 
     @Override
@@ -56,6 +56,7 @@ public class Movie implements Parcelable {
         return 0;
     }
 
+    // Métodos getter y setter
     public String getId() {
         return id;
     }
@@ -95,6 +96,7 @@ public class Movie implements Parcelable {
     public void setRating(String rating) {
         this.rating = rating;
     }
+
     public String getOverview() {
         return overview;
     }
@@ -110,5 +112,4 @@ public class Movie implements Parcelable {
     public void setGenreId(String genreId) {
         this.genreId = genreId;
     }
-
 }

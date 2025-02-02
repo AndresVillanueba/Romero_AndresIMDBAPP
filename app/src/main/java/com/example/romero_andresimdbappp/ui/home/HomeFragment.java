@@ -20,10 +20,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeFragment extends Fragment {
-
-    private RecyclerView recyclerView;
-    private MovieAdapter movieAdapter;
-    private List<Movie> movieList = new ArrayList<>();
+    private List<Movie> Movielist = new ArrayList<>();
+    private RecyclerView Recyclerview;
+    private MovieAdapter Movieadapter;
     private boolean isDataFetched = false; // Variable para controlar las llamadas
     private static final String API_KEY = "c1cce6d145msh19937f212457748p163fd5jsnb262629a6f45";
     private static final String API_HOST = "imdb-com.p.rapidapi.com";
@@ -32,12 +31,12 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        recyclerView = root.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columnas
-        movieAdapter = new MovieAdapter(movieList, false);
-        recyclerView.setAdapter(movieAdapter);
+        Recyclerview = root.findViewById(R.id.recyclerView);
+        Recyclerview.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columnas
+        Movieadapter = new MovieAdapter(Movielist, false);
+        Recyclerview.setAdapter(Movieadapter);
         // Llamar a fetchMovies() solo si la lista está vacía
-        if (movieList.isEmpty() && !isDataFetched) {
+        if (Movielist.isEmpty() && !isDataFetched) {
             fetchMovies();
         }
 
@@ -74,11 +73,11 @@ public class HomeFragment extends Fragment {
                         movie.setImageUrl(imageUrl);
                         movie.setReleaseYear(releaseYear);
                         // Añadir la película a la lista
-                        movieList.add(movie);
+                        Movielist.add(movie);
                     }
 
                     // Notificar al adaptador para actualizar el RecyclerView
-                    movieAdapter.notifyDataSetChanged();
+                    Movieadapter.notifyDataSetChanged();
                 } else {
                     isDataFetched = false; // Permitir intentar de nuevo si falla
                 }

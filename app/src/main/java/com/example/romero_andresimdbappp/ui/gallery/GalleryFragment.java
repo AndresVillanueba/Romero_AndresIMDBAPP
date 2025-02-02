@@ -1,5 +1,4 @@
 package com.example.romero_andresimdbappp.ui.gallery;
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
@@ -13,21 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import com.example.romero_andresimdbappp.R;
 import com.example.romero_andresimdbappp.adapters.MovieAdapter;
 import com.example.romero_andresimdbappp.database.FavoritesManager;
@@ -59,7 +53,7 @@ public class GalleryFragment extends Fragment {
             });
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_gallery, container, false);
 
         recyclerView = root.findViewById(R.id.recyclerView);

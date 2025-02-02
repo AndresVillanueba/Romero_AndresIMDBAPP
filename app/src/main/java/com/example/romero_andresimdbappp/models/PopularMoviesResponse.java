@@ -4,9 +4,7 @@ import java.util.List;
 
 import java.util.List;
 
-//Clase que modela la respuesta de la API para obtener las películas más populares.
-
-
+//Clase que recibe la respuesta de la API para obtener las películas más populares.
 public class PopularMoviesResponse {
     private Data data;
     public Data getData() {

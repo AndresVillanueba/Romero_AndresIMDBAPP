@@ -22,23 +22,22 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.romero_andresimdbappp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
+    //Variables declaradas mas las que vienen por defecto
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
-    private TextView navEmailTextView;
-    private TextView navHeaderInitialTextView;
+    private TextView CorreoUsuario;
+    private TextView InicialUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // Recibe los datos enviados desde LoginActivity (si existen)
         Intent intent = getIntent();
-        String userName = intent.getStringExtra("USER_NAME");
-        String userEmail = intent.getStringExtra("USER_EMAIL");
+        String usuario = intent.getStringExtra("USER_NAME");
+        String email = intent.getStringExtra("USER_EMAIL");
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -46,12 +45,11 @@ public class MainActivity extends AppCompatActivity {
         // Configuración de Google Sign-In y Firebase Auth
         configureGoogleSignIn();
         mAuth = FirebaseAuth.getInstance();
-        // Obtener las vistas del header (Navigation Drawer)
+        // Obtener las vistas del header
         View headerView = binding.navView.getHeaderView(0);
-        navEmailTextView = headerView.findViewById(R.id.nav_email);
-        navHeaderInitialTextView = headerView.findViewById(R.id.nav_header_initial);
-
-        // Configurar Navigation (NavController y NavigationUI)
+        CorreoUsuario = headerView.findViewById(R.id.nav_email);
+        InicialUsuario = headerView.findViewById(R.id.nav_header_initial);
+        // Configurar Navigation
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
                 .setOpenableLayout(binding.drawerLayout)
@@ -59,16 +57,14 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-
         // Configurar los botones del Header para Sign In y Sign Out
         headerView.findViewById(R.id.btn_google_sign_in).setOnClickListener(v -> signIn());
         headerView.findViewById(R.id.btn_google_sign_out).setOnClickListener(v -> signOut());
-
         // Actualiza la UI del Header según se hayan recibido datos de usuario
-        if (userEmail != null) {
-            navEmailTextView.setText(userEmail);
-            if (userName != null && !userName.isEmpty()) {
-                navHeaderInitialTextView.setText(String.valueOf(userName.charAt(0)).toUpperCase());
+        if (email != null) {
+            CorreoUsuario.setText(email);
+            if (usuario != null && !usuario.isEmpty()) {
+                InicialUsuario.setText(String.valueOf(usuario.charAt(0)).toUpperCase());
             }
             headerView.findViewById(R.id.btn_google_sign_in).setVisibility(View.GONE);
             headerView.findViewById(R.id.btn_google_sign_out).setVisibility(View.VISIBLE);
@@ -129,10 +125,10 @@ public class MainActivity extends AppCompatActivity {
                         if (user != null) {
                             String email = user.getEmail();
                             String displayName = user.getDisplayName();
-                            navEmailTextView.setText(email);
+                            CorreoUsuario.setText(email);
                             if (displayName != null && !displayName.isEmpty()) {
                                 String initial = String.valueOf(displayName.charAt(0)).toUpperCase();
-                                navHeaderInitialTextView.setText(initial);
+                                InicialUsuario.setText(initial);
                             }
                             findViewById(R.id.btn_google_sign_in).setVisibility(View.GONE);
                             findViewById(R.id.btn_google_sign_out).setVisibility(View.VISIBLE);

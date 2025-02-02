@@ -14,79 +14,72 @@ import com.example.romero_andresimdbappp.R;
 import com.example.romero_andresimdbappp.database.FavoritesManager;
 import com.example.romero_andresimdbappp.models.Movie;
 import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.List;
 
-/**
- * Adaptador para mostrar películas en un RecyclerView.
- * Soporta clic largo para agregar/eliminar favoritos.
- */
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
-    private List<Movie> movieList;
-    private Context context;
-    private boolean isFavoritesMode; // Indica si se usa en la lista de favoritos
+// Adaptador para mostrar películas en RecyclerView
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.VistaPeliculas> {
+    private List<Movie> listaPeliculas;
+    private Context contexto;
+    private boolean modoFavoritos; // Indica si se usa en favoritos
 
-    public MovieAdapter(List<Movie> movieList, boolean isFavoritesMode) {
-        this.movieList = movieList;
-        this.isFavoritesMode = isFavoritesMode;
+    public MovieAdapter(List<Movie> listaPeliculas, boolean modoFavoritos) {
+        this.listaPeliculas = listaPeliculas;
+        this.modoFavoritos = modoFavoritos;
     }
 
     @Override
-    public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.item_movie, parent, false);
-        return new MovieViewHolder(view);
+    public VistaPeliculas onCreateViewHolder(ViewGroup padre, int tipoVista) {
+        contexto = padre.getContext();
+        View vista = LayoutInflater.from(contexto).inflate(R.layout.item_movie, padre, false);
+        return new VistaPeliculas(vista);
     }
 
     @Override
-    public void onBindViewHolder(MovieViewHolder holder, int position) {
-        Movie movie = movieList.get(position);
+    public void onBindViewHolder(VistaPeliculas holder, int posicion) {
+        Movie pelicula = listaPeliculas.get(posicion);
 
-        // Cargar imagen con Glide
+        // Cargar imagen con Glide (esto mismo se puede hacer con volley)
         Glide.with(holder.itemView.getContext())
-                .load(movie.getImageUrl())
-                .into(holder.imageView);
+                .load(pelicula.getImageUrl())
+                .into(holder.imagenPelicula);
 
-        // Clic corto: abrir detalles
+        //Clic corto: abrimos los detalles de la pelicula
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, MovieDetailsActivity.class);
-            intent.putExtra("MOVIE_DATA", movie);
-            context.startActivity(intent);
+            Intent intent = new Intent(contexto, MovieDetailsActivity.class);
+            intent.putExtra("MOVIE_DATA", pelicula);
+            contexto.startActivity(intent);
         });
 
-        // 🔹 Clic largo: Agregar o eliminar de favoritos
+        // Clic largo: Agregar o eliminar de favoritos
         holder.itemView.setOnLongClickListener(v -> {
-            FavoritesManager favoritesManager = new FavoritesManager(context);
-            String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            FavoritesManager gestorFavoritos = new FavoritesManager(contexto);
+            String correoUsuario = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-            if (isFavoritesMode) {
-                // Modo favoritos: Eliminar de favoritos
-                favoritesManager.removeFavorite(movie.getId(), userEmail);
-                movieList.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, movieList.size());
-                Toast.makeText(context, "Eliminada de favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+            if (modoFavoritos) {
+                // Modo favoritos: eliminar de la lista
+                gestorFavoritos.removeFavorite(pelicula.getId(), correoUsuario);
+                listaPeliculas.remove(posicion);
+                notifyItemRemoved(posicion);
+                notifyItemRangeChanged(posicion, listaPeliculas.size());
+                Toast.makeText(contexto, "Eliminada de favoritos: " + pelicula.getTitle(), Toast.LENGTH_SHORT).show();
             } else {
-                // Modo normal: Agregar a favoritos
-                favoritesManager.addFavorite(movie, userEmail);
-                Toast.makeText(context, "Agregada a favoritos: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+                // Modo normal: agregar a favoritos
+                gestorFavoritos.addFavorite(pelicula, correoUsuario);
+                Toast.makeText(contexto, "Agregada a favoritos: " + pelicula.getTitle(), Toast.LENGTH_SHORT).show();
             }
-            return true; // 🔹 IMPORTANTE: Devuelve `true` para que OnLongClick funcione
+            return true; // Devuelve `true` para que OnLongClick funcione
         });
     }
-
     @Override
     public int getItemCount() {
-        return movieList.size();
+        return listaPeliculas.size();
     }
-
     // ViewHolder para representar una película en la lista
-    public static class MovieViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-
-        public MovieViewHolder(View itemView) {
+    public static class VistaPeliculas extends RecyclerView.ViewHolder {
+        ImageView imagenPelicula;
+        public VistaPeliculas(View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.movie_image);
+            imagenPelicula = itemView.findViewById(R.id.movie_image);
         }
     }
 }
