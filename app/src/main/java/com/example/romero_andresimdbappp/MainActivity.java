@@ -22,7 +22,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.romero_andresimdbappp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private static final int RC_SIGN_IN = 9001;
