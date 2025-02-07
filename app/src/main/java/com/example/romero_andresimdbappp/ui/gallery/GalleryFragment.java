@@ -27,12 +27,9 @@ import com.example.romero_andresimdbappp.adapters.MovieAdapter;
 import com.example.romero_andresimdbappp.database.FavoritesManager;
 import com.example.romero_andresimdbappp.models.Movie;
 
-/**
- * Muestra las películas favoritas guardadas por el usuario.
- * Además, permite compartir la lista en formato JSON mediante Bluetooth.
- */
+//Muestra las películas favoritas guardadas por el usuario.
+// Además, permite compartir la lista en formato JSON mediante Bluetooth.
 public class GalleryFragment extends Fragment {
-
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
     private List<Movie> favoriteMovies = new ArrayList<>();
@@ -71,9 +68,7 @@ public class GalleryFragment extends Fragment {
         return root;
     }
 
-    /**
-     * Obtiene las películas favoritas del usuario y las muestra en la lista.
-     */
+    //Obtiene las películas favoritas del usuario y las muestra en la lista.
     private void cargarPeliculasFavoritas() {
         String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         favoriteMovies = favoritesManager.getFavorites(userEmail);
@@ -84,9 +79,8 @@ public class GalleryFragment extends Fragment {
         recyclerView.setAdapter(movieAdapter);
     }
 
-    /**
-     * Comparte las películas favoritas en formato JSON a través de Bluetooth.
-     */
+    //Comparte las películas favoritas en formato JSON a través de Bluetooth.
+
     private void compartirPeliculas() {
         if (favoriteMovies.isEmpty()) {
             Toast.makeText(requireContext(), "No hay favoritos para compartir.", Toast.LENGTH_SHORT).show();
@@ -98,22 +92,16 @@ public class GalleryFragment extends Fragment {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             bluetoothPermissionLauncher.launch(new String[]{
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.BLUETOOTH_CONNECT
             });
         } else {
             bluetoothPermissionLauncher.launch(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.BLUETOOTH
             });
         }
     }
 
-    /**
-     * Muestra un diálogo con el JSON antes de enviarlo por Bluetooth.
-     * @param jsonFavorites JSON con las películas favoritas.
-     */
+    //Muestra un diálogo con el JSON antes de enviarlo por Bluetooth.
     private void shareFavoritesViaBluetooth(String jsonFavorites) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Lista de Favoritos en JSON")
@@ -123,9 +111,7 @@ public class GalleryFragment extends Fragment {
                 .show();
     }
 
-    /**
-     * Prepara y envía el JSON mediante una app de Bluetooth disponible en el dispositivo.
-     */
+    //Prepara y envía el JSON mediante una app de Bluetooth disponible en el dispositivo.
     private void iniciarEnvioBluetooth(String jsonFavorites) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, jsonFavorites);
@@ -144,10 +130,7 @@ public class GalleryFragment extends Fragment {
 
         Toast.makeText(requireContext(), "No se encontró una app de Bluetooth.", Toast.LENGTH_SHORT).show();
     }
-
-    /**
-     * Muestra o esconde el mensaje de "Lista vacía" según el contenido de favoritos.
-     */
+    //Muestra o esconde el mensaje de "Lista vacía" según el contenido de favoritos.
     private void actualizarVistaVacia() {
         if (favoriteMovies.isEmpty()) {
             emptyView.setVisibility(View.VISIBLE);
@@ -158,18 +141,14 @@ public class GalleryFragment extends Fragment {
         }
     }
 
-    /**
-     * Recarga la lista de favoritos cuando el fragmento se reanuda.
-     */
+    //Recarga la lista de favoritos cuando el fragmento se reanudar
     @Override
     public void onResume() {
         super.onResume();
         cargarPeliculasFavoritas();
     }
 
-    /**
-     * Evita fugas de memoria eliminando referencias innecesarias.
-     */
+    //Evita fugas de memoria eliminando referencias innecesarias.
     @Override
     public void onDestroyView() {
         super.onDestroyView();

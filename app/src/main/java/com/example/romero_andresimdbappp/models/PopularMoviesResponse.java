@@ -1,7 +1,4 @@
 package com.example.romero_andresimdbappp.models;
-
-import java.util.List;
-
 import java.util.List;
 
 //Clase que recibe la respuesta de la API para obtener las películas más populares.

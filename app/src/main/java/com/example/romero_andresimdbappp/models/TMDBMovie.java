@@ -2,9 +2,8 @@ package com.example.romero_andresimdbappp.models;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-/**
- * Modelo de datos TMDB API.
- */
+//Modelo de datos TMDB API.
+
 public class TMDBMovie {
     public static class GenresResponse {
         @SerializedName("genres")

@@ -39,7 +39,6 @@ public class HomeFragment extends Fragment {
         if (Movielist.isEmpty() && !isDataFetched) {
             fetchMovies();
         }
-
         return root;
     }
 
